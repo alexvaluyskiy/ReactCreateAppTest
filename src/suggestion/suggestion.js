@@ -8,7 +8,7 @@ class Suggestion extends Component {
       items: [],
       searchFieldData: '',
       nextItemId: 0,
-      suggestionListVisible: true
+      suggestionListVisible: false
     };
 
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
@@ -29,16 +29,9 @@ class Suggestion extends Component {
     const newNextItemId = Math.max(...this.props.items.map(x => x.id)) || 0;
     this.setState({nextItemId: newNextItemId + 1});
     console.log('componentDidMount');
-
-    this.suggestionOptionsDOMElement.style.width = `${this.suggestionDOMElement.offsetWidth}px`;
-  }
-
-  componentWillReceiveProps(nextProps, nextState) {
-    console.log('componentWillReceiveProps');
-  }
-
-  componentWillUnmount() {
-    console.log('componentWillUnmount');
+    if (this.suggestionOptionsDOMElement) {
+      this.suggestionOptionsDOMElement.style.width = `${this.suggestionDOMElement.offsetWidth}px`;
+    }
   }
 
   handleDeleteClick(e, item) {
@@ -75,6 +68,8 @@ class Suggestion extends Component {
       console.log('process ArrowDown')
     } else if (event.keyCode === 8) {
       console.log('process Backspace')
+    } else {
+      this.setState({suggestionListVisible: true});
     }
   }
 
@@ -111,6 +106,7 @@ class Suggestion extends Component {
     });
 
     this.setState({items: [...this.state.items, newItem]});
+    this.setState({suggestionListVisible: false});
   }
 
   _createBlocksFromRawText(str) {
