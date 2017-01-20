@@ -1,6 +1,4 @@
 .suggestion-tags {
-
-
   .suggestion-box {
     margin: 4px 3px 3px 3px;
     border: none;
@@ -10,6 +8,7 @@
     height: 18px;
     box-sizing: border-box;
     position: relative;
+    user-select: none;
 
     & > div {
       margin: 0;
@@ -33,4 +32,14 @@
       }
     }
   }
+}
+
+.suggestion-options {
+  position: absolute;
+  box-sizing: border-box;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  z-index: 1;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.12), 0px 2px 2px 0px rgba(0, 0, 0, 0.24);
 }

@@ -7,7 +7,8 @@ class Suggestion extends Component {
     this.state = {
       items: [],
       searchFieldData: '',
-      nextItemId: 0
+      nextItemId: 0,
+      suggestionListVisible: true
     };
 
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
@@ -16,6 +17,7 @@ class Suggestion extends Component {
     this.handleInputBlur = this.handleInputBlur.bind(this);
     this.handleInputPaste = this.handleInputPaste.bind(this);
     this.handleInputDrop = this.handleInputDrop.bind(this);
+    this.handleSuggestionInputClick = this.handleSuggestionInputClick.bind(this);
   }
 
   componentWillMount() {
@@ -27,6 +29,12 @@ class Suggestion extends Component {
     const newNextItemId = Math.max(...this.props.items.map(x => x.id)) || 0;
     this.setState({nextItemId: newNextItemId + 1});
     console.log('componentDidMount');
+
+    this.suggestionOptionsDOMElement.style.width = `${this.suggestionDOMElement.offsetWidth}px`;
+  }
+
+  componentWillReceiveProps(nextProps, nextState) {
+    console.log('componentWillReceiveProps');
   }
 
   componentWillUnmount() {
@@ -42,8 +50,8 @@ class Suggestion extends Component {
   }
 
   handleInputKeyUp(event) {
-    // process semicolon
     if (event.keyCode === 186) {
+      // process semicolon
       const boxText = this.state.searchFieldData.substr(0, this.state.searchFieldData.indexOf(';')).trim();
       if (boxText.length === 0) {
         return;
@@ -52,6 +60,21 @@ class Suggestion extends Component {
       const restText = this.state.searchFieldData.substr(this.state.searchFieldData.indexOf(';') + 1, this.state.searchFieldData.length).trim();
       this.setState({items: [...this.state.items, {id: this._nextItemId(), text: boxText, notSuggested: true}]});
       this.setState({searchFieldData: restText});
+    } else if (event.keyCode === 13) {
+      // process enter
+      const boxText = this.state.searchFieldData.trim();
+      if (boxText.length === 0) {
+        return;
+      }
+
+      this.setState({items: [...this.state.items, {id: this._nextItemId(), text: boxText, notSuggested: true}]});
+      this.setState({searchFieldData: ''});
+    } else if (event.keyCode === 38) {
+      console.log('process ArrowUp');
+    } else if (event.keyCode === 40) {
+      console.log('process ArrowDown')
+    } else if (event.keyCode === 8) {
+      console.log('process Backspace')
     }
   }
 
@@ -75,6 +98,21 @@ class Suggestion extends Component {
     this._createBlocksFromRawText(e.dataTransfer.getData('Text'));
   }
 
+  handleSuggestionInputClick(event) {
+    const attrs = [...event.nativeEvent.target.attributes];
+
+    let newItem = {
+      id: this._nextItemId()
+    };
+
+    attrs.filter(item => item.name.startsWith('data')).forEach(item => {
+      const newName = item.name.replace('data-', '');
+      newItem[newName] = item.nodeValue
+    });
+
+    this.setState({items: [...this.state.items, newItem]});
+  }
+
   _createBlocksFromRawText(str) {
     let newItems = str.split(';').map(i => i.trim());
     if (newItems[newItems.length - 1]) {
@@ -96,7 +134,7 @@ class Suggestion extends Component {
 
   render() {
     return (
-      <div className="suggestion">
+      <div className="suggestion" ref={element => this.suggestionDOMElement = element}>
         <div className="suggestion-tags">
           {this.state.items.map(item => {
             return <div className="suggestion-box" key={item.id}>
@@ -113,6 +151,13 @@ class Suggestion extends Component {
             onPaste={this.handleInputPaste}
             onDrop={this.handleInputDrop} />
         </div>
+        {this.state.suggestionListVisible &&
+          <div className="suggestion-options"
+            ref={element => this.suggestionOptionsDOMElement = element}
+            onClick={this.handleSuggestionInputClick}>
+            {this.props.children}
+          </div>
+        }
       </div>
     );
   }

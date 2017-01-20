@@ -29,4 +29,22 @@
   padding: 15px;
   width: 400px;
 
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    box-sizing: border-box;
+
+    li {
+      box-sizing: border-box;
+      height: 28px;
+      padding: 8px;
+      user-select: none;
+
+      &:hover {
+        cursor: pointer;
+        background-color: #EAF6E2;
+      }
+    }
+  }
 }
